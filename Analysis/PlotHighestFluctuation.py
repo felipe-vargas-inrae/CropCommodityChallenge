@@ -7,7 +7,7 @@ Created on Sun Oct 14 16:40:57 2018
 This script is to show the groups with a high fluctuation
 this step use Monthly_data_cmo_step3 where we create a column to save
 the rate of fluctuation to monthly and frequency(inside the group) prices
-finaly this file return a new file flagging every group which show a fluctuated behavior
+finally  this file return a new file flagging every group which show a fluctuated behavior
 I use the quantile 90% to take by means of the by commodity set
 
 """
