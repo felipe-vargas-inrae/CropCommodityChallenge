@@ -10,7 +10,7 @@ The main tasks were:
 * Data Analysis: Study time series data, try to guess seasonal behavior over many groups of commodity, APMC
 
 For further information go to file Documents/Report.pdf
-For definition and data explanation go to file Documents/Definitions.pdf
+For definitions and data explanation go to file Documents/Definitions.pdf
 
 # How to run the code?
 
@@ -35,7 +35,7 @@ data/Reports/CommoditiesTS_max_price.pdf
 ## Next Step 
 Go to folder Analysis and run 
 ```
- python SeasonalityDetection.py
+ python PlotSeasonalityDetection.py
 ```
 
 this commands will create these files:
@@ -45,7 +45,8 @@ this commands will create these files:
 
 This report was useful to see the general behavior of the data 
 moving the frequency value of seasonal component, for all the groups 
-is shown three plots for quarterly, bianual, and anual, which is better for this specific group?
+is shown three plots for quarterly, bianual, and anual, which is better for this specific group?,
+in this plot you can see the seasonal component for an additive model and for a multiplicative model
 
 ## Next Step 
 Continue in the folder Analysis and run 
@@ -56,16 +57,21 @@ this commands will create these files:
 ```
 ./data/Cleaned/Monthly_data_cmo_step3.csv
 ```
-This file contains the dataset with frequency selected using some models, and two rows for fluctuations
+This file contains the dataset with frequency selected using a model for validation, 
+and two rows for understanding fluctuations
 
 ## Finally run 
 
 Continue in the folder Analysis and run 
 ```
- python SeasonalInferenceFrequency.py
+ python PlotSeasonalDecomPriceSupport.py
+ PlotSeasonalityDetection.py
 ```
+Both scripts use the step3 data and the PlotSeasonalDecomPriceSupport file also use CMO_MSP_Mandi_step1.csv
+for join combination to show price support compared with series
+
 ## Notebook
-If you want to see a step by step explanation go to folder notebook an open the file
+If you want to see a step by step explanation go to folder notebook an open the file 
 
 # Versions of package
 ```
