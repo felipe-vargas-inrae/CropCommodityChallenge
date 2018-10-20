@@ -56,8 +56,6 @@ def viewPlotsTS(DataFrame_View,myColumnValue):
     i=0
     MAX_I=99999
     
-    
-    
     pdf= PdfPages('./Reports/CommoditiesTS_%s.pdf'%(myColumnValue))
     
     for name, group in by_group:

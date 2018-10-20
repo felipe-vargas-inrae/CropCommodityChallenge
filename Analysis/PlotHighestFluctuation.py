@@ -116,17 +116,11 @@ def viewFlagged(DataFrame_View):
             
             plt.xticks(rotation=90)
             
-            try :
-                pdf.savefig()  # saves the current figure into a pdf page
-            except:
-                print("an exception")
-                
-        else: 
-            print("NO fluctuated")
+            
+            
             
     pdf.close()
         
 DF_flag=flagMostFluctuation(DF_Month)
-
 viewFlagged(DF_flag)
 
