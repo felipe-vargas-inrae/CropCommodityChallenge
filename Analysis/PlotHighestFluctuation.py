@@ -4,8 +4,11 @@ Created on Sun Oct 14 16:40:57 2018
 
 @author: LFVARGAS
 "" 
-
-@Description Outliers detectetion
+This script is to show the groups with a high fluctuation
+this step use Monthly_data_cmo_step3 where we create a column to save
+the rate of fluctuation to monthly and frequency(inside the group) prices
+finaly this file return a new file flagging every group which show a fluctuated behavior
+I use the quantile 90% to take by means of the by commodity set
 
 """
 
@@ -19,7 +22,7 @@ import matplotlib.pyplot as plt
 
 
 from Commodity import Commodity
-#from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.backends.backend_pdf import PdfPages
 #Constans
 os.chdir("../")#AFFECT ALL THE EXETCUTION
 
@@ -45,13 +48,21 @@ def flagMostFluctuation(DataFrame_View):
 #                key=lambda x: len(x["rate_monthly_fluc"]),  # sort by number of rows (len of subDataFrame)
 #                reverse=True)  # reverse the sort i.e. largest first
     dataset= None
+    print(len(by_group))
     for name, group in by_group:
         rate_monthly_fluc=group["rate_monthly_fluc"]
         rate_frequency_fluc=group["rate_frequency_fluc"]
         
-        LIMIT=.7
+        LIMIT=.9
         limitMonth=rate_monthly_fluc.quantile(LIMIT)
-        limitFreq=rate_monthly_fluc.quantile(LIMIT)
+        limitFreq=rate_frequency_fluc.quantile(LIMIT)
+        
+#        rate_monthly_fluc.hist(label="Month")
+#        plt.show()
+#        rate_frequency_fluc.hist(label="Freq")
+#        plt.show()
+#        print(limitMonth)
+#        print(limitFreq)
         
         def comparable(x,y):
             if(x>y):
@@ -66,6 +77,8 @@ def flagMostFluctuation(DataFrame_View):
             dataset=group
         else: 
             dataset=dataset.append(group, ignore_index=True) 
+            
+        
                
     return dataset
 
@@ -75,11 +88,13 @@ def viewFlagged(DataFrame_View):
     by_group=sorted(by_group,  # iterates pairs of (key, corresponding subDataFrame)
                 key=lambda x: len(x[1]),  # sort by number of rows (len of subDataFrame)
                 reverse=True)  # reverse the sort i.e. largest first
+    pdf= PdfPages('./Reports/GroupsHighFluctuation.pdf')
+    
     for name, group in by_group:
         
         isHighFreq=group["Highest_Fluctuation_Freq"].iloc[0]
         isHighMonth=group["Highest_Fluctuation_Month"].iloc[0]
-        if(isHighFreq ):
+        if(isHighFreq or isHighMonth):
             realName= commodityManager.getNameById(name[0])
             displayName=str(name[0])+"-"+realName
             displayName=displayName+"-"+name[1]
@@ -100,16 +115,18 @@ def viewFlagged(DataFrame_View):
             ax.legend(loc='best')
             
             plt.xticks(rotation=90)
-            plt.show()
+            
+            try :
+                pdf.savefig()  # saves the current figure into a pdf page
+            except:
+                print("an exception")
+                
         else: 
             print("NO fluctuated")
-    
+            
+    pdf.close()
         
 DF_flag=flagMostFluctuation(DF_Month)
 
 viewFlagged(DF_flag)
-
-#DF_Season= pd.read_csv("./%s%s"%(FILE_OUT,FILE_FORMAT))
-
-#DF_Season_Flag=flagMostFluctuation(DF_Season)
 
