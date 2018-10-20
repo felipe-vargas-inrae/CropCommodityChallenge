@@ -5,20 +5,19 @@ actually stock prices of agriculture commodities.
 Many crops and  APMC (Agricultural produce market committee)/mandi were collected with information about monthly price fluctuation.
 
 The main tasks were:
-* Data Preparation: remove outliers, missing, and duplicates, create Ids and standarize join columns like Commodity
+* Data Preparation: remove outliers, missing, and duplicates, create Ids and standardize join columns like Commodity
 * Data Exploration: view the behavior of the time series data, and plot it for better understand
 * Data Analysis: Study time series data, try to guess seasonal behavior over many groups of commodity, APMC
 
 For further information go to file Documents/Report.pdf
-For definitions and data explanation go to file Documents/Definitions.pdf
 
 # How to run the code?
 
-The  scripts must be executed in a sequencial order because one step depends of others
+The  scripts must be executed in a sequential order because one step depends of others
 
 ## First 
 
-Go to Folder Preprocesing an run 
+Go to Folder Preprocessing an run 
 ```
  python OutliersDetection.py
  python PlotByCommodity.py
@@ -45,7 +44,7 @@ this commands will create these files:
 
 This report was useful to see the general behavior of the data 
 moving the frequency value of seasonal component, for all the groups 
-is shown three plots for quarterly, bianual, and anual, which is better for this specific group?,
+is shown three plots for quarterly, biannual, and annual, which is better for this specific group?,
 in this plot you can see the seasonal component for an additive model and for a multiplicative model
 
 ## Next Step 
@@ -82,3 +81,4 @@ matplotlib                         2.2.2
 Levenshtein                        0.12.0
 statsmodels                        0.9.0
 ```
+
