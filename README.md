@@ -65,7 +65,7 @@ Continue in the folder Analysis and run
  python SeasonalInferenceFrequency.py
 ```
 ## Notebook
-If you want to see and step by step explanation go to folder notebook an open the file
+If you want to see a step by step explanation go to folder notebook an open the file
 
 # Versions of package
 ```
