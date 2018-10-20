@@ -5,8 +5,6 @@ Created on Sun Oct 14 16:40:57 2018
 @author: LFVARGAS
 "" 
 
-@Description 
-
 This Script depends of the data from step 2,
 
 
@@ -15,10 +13,13 @@ the first task is to type the date column for use date functions and create time
 
 for each group the script will try to find the best seasonal behavior 
 taking the Dickey Fullier Test and iterating over multiple frequencies [1,3,6,12]
+I defined the p value THRESHOLD_pvalue=0.3, to be acceptable over 30% because data is not so uniform
 after run every test the script select the frequency that is better for deseanolize the time series
 
 Finally the script creates new columns for save the monthly and current frequency  fluctuations
 
+
+Note: some groups didn't pass the test so they won't be taking into account
 """
 
 import  os,sys
@@ -26,12 +27,9 @@ sys.path.append('../Factory')# commodity folder
 
 import numpy as np
 import pandas as pd
-from pandas.tools.plotting import autocorrelation_plot
-import matplotlib.pyplot as plt
 
 
 from Commodity import Commodity
-from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import adfuller
 #from matplotlib.backends.backend_pdf import PdfPages
 #Constans
@@ -80,7 +78,7 @@ def SeasonalityColumnRemove(DataFrame_View):
                 reverse=True)  # reverse the sort i.e. largest first
     
     i=0
-    MAX_I=999
+    MAX_I=99999
     
     #pdf= PdfPages('./Reports/CommoditiesSeasonalAnalysis.pdf')
     
@@ -93,10 +91,6 @@ def SeasonalityColumnRemove(DataFrame_View):
         
         
         group=group.sort_values("date")
-        
-        #plt.title(str(name)+"-"+realName+"-TS Plot")
-        #for this comodity which is the APMC associated
-        
         
         group["date"]=pd.to_datetime(group["date"])
         group=group.set_index("date")
@@ -127,9 +121,6 @@ def SeasonalityColumnRemove(DataFrame_View):
         
             ts_price_freq_mean=ts_price_used.rolling(frequency).mean()
             ts_price_freq_std=ts_price_used.rolling(frequency).std()
-            
-            result=seasonal_decompose(ts_price, freq=frequency)
-            
             
             # remove seasonality and trend
             group["modal_price_nostationary_ma"]=ts_price_used- ts_price_freq_mean

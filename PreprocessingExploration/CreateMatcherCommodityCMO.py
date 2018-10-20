@@ -3,6 +3,15 @@
 Created on Sun Oct 14 16:40:57 2018
 
 @author: LFVARGAS
+
+
+this script if for add the column commodity Id to make easy to join this data with othe data using the same entity
+but sometimes with diferent name and formats
+
+we take the raw data ./data/CMO_MSP_Mandi.csv and return a new file with the addition of the id,
+sometimes words are similar but write in a different way we use Levenshtein distance to find 
+the crop commodity with similar name, like soybean and soyabean, and use the same Id, when we don't
+find any crop in the database similar we should consider to add this one as a new commodity
 """
 
 
@@ -67,7 +76,7 @@ def searchClose(x, seriesNames):
     return currentName
     
 
-
+# all the commodities  should have and ID this is a validation 
 if(len(DF_Validator)>0):
     DF_Validator["CLOSEST_WORD"]=DF_Validator[COLUMN_JOIN_LEFT].apply(lambda x: searchClose(x, DB_Commodity[COLUMN_JOIN_RIGHT]))
     print("Some commodities haven't matched with database information please review it")        

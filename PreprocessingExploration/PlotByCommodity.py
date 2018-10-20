@@ -5,8 +5,11 @@ Created on Sun Oct 14 16:40:57 2018
 @author: LFVARGAS
 "" 
 
-@Description Outliers detectetion
+This a simple report script for visualize all the crops commodities join in one graphic all the 
+instutions that sell this product, then two study how is the general behavior of each crop
 
+the results were tree pdf reports CommoditiesTS_<var_name>.pdf
+Crops are ordered by the number of records, descending so you will see the most populated in the first plot
 """
 
 import  os,sys
@@ -60,8 +63,6 @@ def viewPlotsTS(DataFrame_View,myColumnValue):
     for name, group in by_group:
         
         group=group.sort_values("date")
-        
-        
         
         
         fig, ax  = plt.subplots(figsize=(20, 8))

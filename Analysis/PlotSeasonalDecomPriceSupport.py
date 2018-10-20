@@ -5,7 +5,8 @@ Created on Sun Oct 14 16:40:57 2018
 @author: LFVARGAS
 "" 
 
-@Description Outliers detectetion
+This script is for showing the relationship between some commodities 
+and the support price, and to visualize the deseasonalize data
 
 """
 
@@ -13,20 +14,19 @@ import  os,sys
 sys.path.append('../Factory')# commodity folder 
 
 import pandas as pd
-from pandas.tools.plotting import autocorrelation_plot
+import numpy as np
 import matplotlib.pyplot as plt
 
 
 from Commodity import Commodity
-from statsmodels.tsa.seasonal import seasonal_decompose
 
-#from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.backends.backend_pdf import PdfPages
 #Constans
 os.chdir("../")#AFFECT ALL THE EXETCUTION
 
 RELATIVE_PATH="./data/Cleaned/"
 
-FILE_NAME= RELATIVE_PATH+"Monthly_data_cmo_step2"
+FILE_NAME= RELATIVE_PATH+"Monthly_data_cmo_step3"
 FILE_NAME_2= RELATIVE_PATH+"CMO_MSP_Mandi_step1"
 FILE_FORMAT=".csv"
 GrouperColumns=["CommodityId","APMC"]
@@ -56,15 +56,18 @@ def SeasonalityColumnRemove(DataFrame_View):
                 reverse=True)  # reverse the sort i.e. largest first
     
     i=0
-    MAX_I=1
+    MAX_I=99999
     
-    #pdf= PdfPages('./Reports/CommoditiesSeasonalAnalysis.pdf')
+    pdf= PdfPages('./Reports/GroupsSupporPriceAnalysis.pdf')
     
     dataset=None
     
     for name, group in by_group:
         
-        
+        realName= commodityManager.getNameById(name[0])
+        displayName=str(name[0])+"-"+realName
+        displayName=displayName+"-"+name[1]
+                       
         group=group.sort_values("date")
         
         #plt.title(str(name)+"-"+realName+"-TS Plot")
@@ -80,6 +83,9 @@ def SeasonalityColumnRemove(DataFrame_View):
         
         DF_LocalPrice=DF_SupportPrice[DF_SupportPrice["CommodityId"]==name[0]]
         
+        if(len(DF_LocalPrice)==0):
+            break
+        
         DF_LocalPrice["date"]=pd.to_datetime(DF_LocalPrice["date"])
         DF_LocalPrice=DF_LocalPrice.set_index("date")
         DF_LocalPrice=DF_LocalPrice.sort_index()
@@ -90,61 +96,44 @@ def SeasonalityColumnRemove(DataFrame_View):
         
         DF_LocalPrice=DF_LocalPrice.loc[minDate:maxDate]
         
-        print(minDate)
-        print(maxDate)
-        print(DF_LocalPrice)
         
-        supportPrice_TS=DF_LocalPrice["msprice"]
+        
+        supportPrice_TS=np.log(DF_LocalPrice["msprice"])
         
         
         #SELECTED 
         TYPE="additive"
         FREQ= 12
-        frequency=FREQ
+        frequency=group["Frequenc_Seasonality"].iloc[0]
+        print(frequency)
+        
+        ts_price_log=np.log(group["modal_price"])
         
         
-        ts_price=group["modal_price"]
+        ts_price_freq_mean=ts_price_log.rolling(frequency).mean()
+        ts_price_freq_std=ts_price_log.rolling(frequency).std()
+     
         
         
-        ts_price_12_mean=ts_price.rolling(frequency).mean()
-        ts_price_12_std=ts_price.rolling(frequency).std()
+        group["modal_price_nostationary"]=ts_price_log - ts_price_freq_mean
         
-        result=seasonal_decompose(ts_price, freq=frequency)
-        #result.plot()
-#        print(group.dtypes)
-#        print(group)
-#        print("SEASONAL")
-        #print(result.seasonal)
-        
-        columnNameFuture=str(frequency)+"_past"
-        
-        
-                          
-        group[columnNameFuture]=group["modal_price"].shift(frequency)
-        #group[columnNameFuture]=  group[columnNameFuture].fillna(0)
-        
-        group["modal_price"].shift(1) 
-        
-        # remove seasonality and trend
-        group["modal_price_noseason"]=group["modal_price"] - group[columnNameFuture] 
-        #group["modal_price_notrend"]=group["modal_price"] - group["modal_price"].shift(1) 
-        
-        group["modal_price_nostationary"]=group["modal_price_noseason"]-  group["modal_price"].shift(1)
-        
-        
-        fig, ax  = plt.subplots(figsize=(8,8))
-        plt.plot(group.index,group["modal_price"] , label="Series")
-        plt.plot(group.index,group["modal_price_nostationary"], label="No Season- No Trend" ) 
+        fig, ax  = plt.subplots(figsize=(8,15))
+        ax.set_title(displayName)
+        plt.plot(group.index,ts_price_log , label="Series")
+        plt.plot(group.index,group["modal_price_nostationary"], label="No Season- No Trend Moving Average" ) 
 
-        ts_price_12_mean.plot(label="12 month rolling mean")
-        ts_price_12_std.plot(label="12 month rolling std")
+        ts_price_freq_mean.plot(label="%s month rolling mean"%frequency)
+        ts_price_freq_std.plot(label="%s month rolling std"%frequency)
         supportPrice_TS.plot(label="Minimum Support Price")
         #print(ts_price)
         #autocorrelation_plot(ts_price)
         
         ax.legend(loc='best')
+        
         plt.xticks(rotation=90)
-        plt.show()
+        
+        
+        pdf.savefig()  # saves the current figure into a pdf page
         
         group.reset_index(level=0, inplace=True)
         if dataset is None:
@@ -156,7 +145,8 @@ def SeasonalityColumnRemove(DataFrame_View):
         
         if(i==MAX_I):
             break
-        
+    pdf.close()
+    
     return dataset
     #pdf.close()
     #plt.show()

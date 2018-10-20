@@ -3,6 +3,13 @@
 Created on Sun Oct 14 16:40:57 2018
 
 @author: LFVARGAS
+
+this script if for add the column commodity Id to make easy to join this data with othe data using the same entity
+but sometimes with diferent name and formats
+
+we take the raw data ./data/Monthly_data_cmo.csv and return a new file with the addition of the id
+
+
 """
 
 

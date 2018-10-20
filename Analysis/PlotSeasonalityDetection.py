@@ -4,9 +4,11 @@ Created on Sun Oct 14 16:40:57 2018
 
 @author: LFVARGAS
 "" 
+Multiplicative or Additive?
 
-@Description Outliers detectetion
-
+This script is for exploring the data and decide the type of seasonality if it is multiplicative
+or additive, after to see all the plots we could decide that are additive models because 
+changes in trend didn't imply changes in the seasonality
 """
 
 import  os,sys
@@ -39,9 +41,6 @@ DF_Month["date"]=pd.to_datetime(DF_Month["date"], format='%Y-%m-%d')
 commodityManager=Commodity()
 
 
-
-
-
 def viewPlotsTS(DataFrame_View):
     by_group = DataFrame_View.groupby(GrouperColumns)
     
@@ -66,6 +65,7 @@ def viewPlotsTS(DataFrame_View):
         apmcs=group["APMC"].unique()[:1]
         
         for index,item in enumerate(apmcs):
+            
             groupFiltered=group[group["APMC"]==item]
             groupFiltered=groupFiltered.sort_values("date")
             
@@ -81,7 +81,11 @@ def viewPlotsTS(DataFrame_View):
             ax.set_title(realName)
             FREQ= [3,6,12]   
             for ite in range(3) :
+                
+                
                 frequency=FREQ[ite]
+                if(len(groupFiltered)<=frequency):
+                    break
                 result=seasonal_decompose(groupFiltered, model='additive', freq=frequency)
                 result2=seasonal_decompose(groupFiltered,freq=frequency,model='multiplicative')
                 
@@ -93,7 +97,7 @@ def viewPlotsTS(DataFrame_View):
                 ax1.legend(loc='best')
                 plt.xticks(rotation=90)
         
-        pdf.savefig()  # saves the current figure into a pdf page
+            pdf.savefig()  # saves the current figure into a pdf page
         
         i=i+1
         
@@ -104,45 +108,3 @@ def viewPlotsTS(DataFrame_View):
 
 
 viewPlotsTS(DF_Month)
-
-#
-#DF_Month["date"]=pd.to_datetime(DF_Month["date"])
-#DF_Month=DF_Month.set_index("date")
-#DF_Month=DF_Month.sort_index()
-#
-#del DF_Month["CommodityId"]
-#del DF_Month["APMC"]
-#del DF_Month["min_price"]
-#del DF_Month["max_price"]
-#del DF_Month["arrivals_in_qtl"]
-##
-#PERIOD=12
-#DF_Month["12M_change_pct"]= DF_Month.pct_change(PERIOD)
-#
-#plt.clf()  # clear the plot space
-#DF_Month["12M_change_pct"].plot.hist(bins=50)
-#plt.xlabel('adjusted close 1-year percent change')
-#plt.show()
-#
-#
-#DF_Month['12M_future_close']=DF_Month['min_price'].shift(-PERIOD)
-#
-#DF_Month['12M_future_close_pct']= DF_Month['12M_future_close'].pct_change(PERIOD)
-
-
-#FREQ=6
-#plt.clf()  # clear the plot space
-#result=seasonal_decompose(DF_Month, model='additive', freq=FREQ)
-##result.plot()
-#plt.show()
-##
-#plt.clf()  # clear the plot space
-#result2=seasonal_decompose(DF_Month,freq=FREQ,model='multiplicative')
-##result2.plot()
-#plt.show()
-#
-#fig, ax  = plt.subplots()
-#plt.plot(DF_Month.index, DF_Month['modal_price'], label="Original")
-#plt.plot(DF_Month.index, result.seasonal, label="seasonal  additive")
-#plt.plot(DF_Month.index, result2.seasonal, label="seasonal  multiplicative")
-#ax.legend(loc='best')
